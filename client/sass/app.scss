@@ -1,0 +1,138 @@
+@import "reset";
+
+body,
+html {
+	font-weight: normal;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.stateForm {
+	width: 500px;
+
+	margin-top: 300px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.formBorder {
+	border: 1px solid #000000;
+	border-radius: 10px;
+}
+
+.stateInputContainer {
+	width: 500px;
+	position: relative;
+}
+
+.stateInput {
+	width: 500px;
+	height: 40px;
+
+	margin: 0;
+
+	border: 1px solid #000000;
+	border-radius: 10px;
+
+	padding-left: 10px;
+}
+
+.stateInput:focus {
+	outline: 0;
+}
+
+.clearStateInput {
+	position: absolute;
+
+	top: 12px;
+	right: 5px;
+
+	color: grey;
+
+	cursor: pointer;
+}
+
+.clearStateInput:hover {
+	color: rgb(63, 63, 63);
+}
+
+.clearStateInputInvisible {
+	visibility: hidden;
+}
+
+.resultsContainer {
+	max-height: 180px;
+
+	width: 500px;
+	overflow-y: scroll;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.resultsContainer::-webkit-scrollbar {
+	width: 0;
+}
+
+.result {
+	background-color: white;
+	width: 100%;
+	height: 40px;
+	text-align: left;
+	padding-left: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border: 0 solid transparent;
+	cursor: pointer;
+}
+
+.result:hover {
+	background-color: #8ee3ee;
+}
+
+.selectedContainer {
+	position: relative;
+
+}
+
+.selectedContainerFull {
+	margin-top: 20px;
+
+	border-radius: 10px;
+	border: 1px solid #000000;
+}
+
+.selected {
+	height: 40px;
+
+	border: 0 solid transparent;
+	background-color: white;
+}
+
+.selected:hover {
+	background-color: white;
+}
+
+.result:focus {
+	border: 0 solid transparent;
+	outline: none;
+	background-color: #28bdd1;
+}
+
+.removeSelectedButton {
+	border-radius: 50%;
+	height: 15px;
+	width: 15px;
+	position: absolute;
+	top: 12px;
+	right:5px;
+
+	color: grey;
+
+	text-align: center;
+
+	cursor: pointer;
+}
+
+.removeSelectedButton:hover {
+	color: rgb(63, 63, 63);
+}

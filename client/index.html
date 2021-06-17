@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Verndale Javascript Code Test</title>
+	<link rel="stylesheet" href="app.scss">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+</head>
+<body>
+	<div id="app">
+		<!-- Autocomplete component -->
+		<form id="stateForm" class="stateForm" autocomplete="off" action="">
+			<div id="inputContainer" class="stateInputContainer">
+				<input class="stateInput" id="stateInput" type="text" name="stateInput" placeholder="Search A US State">
+				<i id="clearStateInput" class="fas fa-times-circle clearStateInput"></i>
+				<div id="resultsContainer" class="resultsContainer">
+				</div>
+			</div>
+			<br>
+			<p>Selected State</p>
+			<div id="selectedContainer" class="selectedContainer">	
+			</div>
+		</form>
+	</div>
+	<script src="./js/App.js"></script>
+	<script src='../dist/main-bundle.js'></script>
+</body>
+</html>
