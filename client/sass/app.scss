@@ -91,7 +91,6 @@ html {
 
 .selectedContainer {
 	position: relative;
-
 }
 
 .selectedContainerFull {
@@ -103,13 +102,20 @@ html {
 
 .selected {
 	height: 40px;
+	width: 100%;
+
+	text-align: left;
 
 	border: 0 solid transparent;
 	background-color: white;
 }
 
+.selected:focus {
+	background-color: #28bdd1;
+}
+
 .selected:hover {
-	background-color: white;
+	background-color: #8ee3ee;
 }
 
 .result:focus {

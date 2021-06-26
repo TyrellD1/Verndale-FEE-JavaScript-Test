@@ -11,9 +11,9 @@ const selectedContainer = document.getElementById("selectedContainer");
 const form = document.getElementById("stateForm");
 const inputContainer = document.getElementById("inputContainer");
 
-// Sets focused Element(selected element) to stateInput
-let focusedElement = 100;
 let results = false;
+let lastChildFocused = false;
+let selected = false;
 
 // Shows/Hides Clear Input Button for stateInput(search bar)
 const toggleClearInputButtonVisibility = () => {
@@ -24,6 +24,24 @@ const toggleClearInputButtonVisibility = () => {
     };
 };
 
+// Toggles if last child is selected
+const toggleLastChild = () => {
+    if(document.activeElement === resultsContainer.lastChild){
+        lastChildFocused=true;
+        console.log("Last Child Focused!")
+    }else lastChildFocused=false;
+}
+
+// Toggles if we selected a state or not
+const toggleSelectedElement = () => {
+    if(selectedContainer.firstChild){
+        if(selectedContainer.firstChild.tagName === 'INPUT'){
+            setTimeout(() => selected=true, 500); // Set's slight delay so we don't focus selected element right away
+            console.log("Element Selected!")
+        }else selected=false;
+    }   
+}
+
 // Hides button to start with
 toggleClearInputButtonVisibility();
 
@@ -32,7 +50,6 @@ const clearResults = () => {
     while (resultsContainer.firstChild) {
         resultsContainer.removeChild(resultsContainer.firstChild);
     };
-    focusedElement = 100;
 };
 
 // Clears selected result and the clear selected result button
@@ -47,27 +64,28 @@ const clearSelected = () => {
 const focusFirstChild = () => {
     if(resultsContainer.firstChild) {
         resultsContainer.firstChild.focus();
-        focusedElement = 0;
     } else return;
 };
 
 // Once we're in the list this traverses downwards
 const focusNextChild = () => {
-    const currentResults = document.querySelectorAll('.result');
-    if(currentResults[focusedElement + 1]) {
-        currentResults[focusedElement + 1].focus();
-        focusedElement++;
+    if(document.activeElement.nextSibling) {
+        document.activeElement.nextSibling.focus();
     };
 };
 
 // This traverses the list upwards
 const focusPrevChild = () => {
-    const currentResults = document.querySelectorAll('.result')
-    if(currentResults[focusedElement - 1]) {
-        currentResults[focusedElement - 1].focus();
-        focusedElement--;    
+    if(document.activeElement.previousSibling) {
+        document.activeElement.previousSibling.focus();
     };
 };
+
+const focusLastChild = () => {
+    if(resultsContainer.lastChild) {
+        resultsContainer.lastChild.focus();
+    } else return;
+}
 
 // Adds remove selected state item
 const addRemoveButton = () => {
@@ -75,6 +93,8 @@ const addRemoveButton = () => {
     removeSelectedButton.className = 'removeSelectedButton fas fa-times-circle';
     removeSelectedButton.addEventListener("click", () => {
         clearSelected();
+        // clearResults();
+        toggleSelectedElement();
     });
     selectedContainer.appendChild(removeSelectedButton);
 };
@@ -115,58 +135,84 @@ const getStates = async () => {
     // and clear our search bar
     if(result.count > 0) {
         results = true;
-        for(let i = 0; i < result.count; i++) {
-            document.querySelector(`#${result.data[i].abbreviation}`).addEventListener("click", () => {
-                if(resultsContainer.contains(document.querySelector(`#${result.data[i].abbreviation}`))) {
-                    clearSelected();
-                    selectedContainer.appendChild(document.querySelector(`#${result.data[i].abbreviation}`));
-                    document.querySelector(`#${result.data[i].abbreviation}`).className = 'selected';
-                    inputContainer.className = "stateInputContainer";
-                    selectedContainer.className = "selectedContainer selectedContainerFull";
-                    addRemoveButton();
-                    clearResults();
-                    stateInput.value = '';
-                    toggleClearInputButtonVisibility();
-                };
-            });
-        };
+        // Passes the event listener to child through event delegation
+        resultsContainer.addEventListener("click", (e) => {
+            clearSelected();
+            selectedContainer.appendChild(e.target) // Maybe come back and conCat
+            e.target.className = 'selected';
+            inputContainer.className = "stateInputContainer";
+            selectedContainer.className = "selectedContainer selectedContainerFull";
+            selected=false;
+            toggleSelectedElement();
+            addRemoveButton();
+            clearResults();
+            stateInput.value = '';
+            toggleClearInputButtonVisibility();
+        })
     } else {
         results = false;
     };
 };
 
+// Allows you to enter selected element without mouse
+document.addEventListener("keyup", (e) => {
+    e.preventDefault();
+    if(e.key ==="Enter" && selected){
+        selectedContainer.firstChild.focus();
+    }else if(e.key ==="Backspace" && document.activeElement === selectedContainer.firstChild){
+        clearSelected();
+        stateInput.focus();
+    }else if(e.key === "Enter" && document.activeElement !== stateInput){
+        stateInput.focus();
+    }
+})
+
+// Fixes 
+form.addEventListener("keydown", function(e) {
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
 // Main event listener, allows up to search, and traverse the results with up and down arrows
 // While accounting for edge cases so the component doesn't break from unusual user behavior
 form.addEventListener("keyup", (e) => {
-    if(e.key === "ArrowDown" && focusedElement === 100 && results) {
+    toggleLastChild();
+    console.log(stateInput.value.length)
+    if((e.key === "ArrowDown" || e.key === "Enter") && document.activeElement === stateInput && results) {
+        e.preventDefault();
         focusFirstChild();
-    }else if(e.key === "ArrowDown" && focusedElement === 100 && !results) {
+    }else if(e.key === "ArrowDown" && document.activeElement === stateInput && !results) {
         e.preventDefault();
-    }else if(e.key ==="ArrowDown" && focusedElement !== 100 && focusedElement < 59) {
+    }else if(e.key ==="ArrowDown" && !lastChildFocused) {
         focusNextChild();
-    }else if(e.key ==="ArrowUp" && focusedElement !== 0 && focusedElement < 59){ 
+        e.preventDefault();
+    }else if(e.key ==="ArrowDown" && lastChildFocused){
+        focusFirstChild();
+    }
+    else if(e.key ==="ArrowUp" && document.activeElement !== resultsContainer.firstChild){ 
         focusPrevChild();
-    }else if(e.key === "ArrowUp" && (focusedElement === 0 || focusedElement === 100)) {
+    }else if(e.key === "ArrowUp" && document.activeElement === resultsContainer.firstChild){
+        focusLastChild();
+    }else if(e.key === "ArrowUp" && document.activeElement === stateInput) {
         stateInput.focus();
-        focusedElement = 100;
-    }else if((e.key === "ArrowLeft" || e.key === "ArrowRight") && focusedElement === 100) {
+    }else if((e.key === "ArrowLeft" || e.key === "ArrowRight") && document.activeElement === stateInput) {
         e.preventDefault();
-    }else if(focusedElement !== 100) {
+    }else if(e.key === 'Escape'){
+        console.log("escape")
+        stateInput.focus();
+    }else if(document.activeElement !== stateInput) {
         e.preventDefault();
-    } else {
+    }else {
         clearResults();
         getStates();
     };
+    toggleSelectedElement();
 });
 
 // Prevent's page reload if user submits input
 form.addEventListener("submit", (e) => {
-    e.preventDefault();
-});
-
-// Sets focused element to search bar when it's clicked
-stateInput.addEventListener("click", () => {
-    focusedElement = 100;    
+    e.preventDefault(); 
 });
 
 // clears the input when clear search bar button is clicked.
